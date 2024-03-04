@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <header>
+        <div class="header-1">
+            <a href="#" class="logo"><i class="fas fs-shopping-basket">gropoto</i></a>
+            <form action="" class="search-box-container">
+                <input type="search" id="search-box" placeholder="search here...">
+                <label for="search-box" class="fas fa-search"></label>
+            </form>
+        </div>
+        <div class="header-2">
+            <div id="menu-bar" class="fas fa-bars"></div>
+            <nav class="navbar">
+                <a href="#home">home</a>
+                <a href="#category">category</a>
+                <a href="#product">product</a>
+                <a href="#deal">deal</a>
+                <a href="#contact">contact</a>
+                <a href="/login">login</a>
+            </nav>
+            <div class="icons">
+                <a href="/addtocart" class="fas fa-shopping-cart"></a>
+                <a href="#" class="fas fa-heart"></a>
+                <a href="#" class="name"><%=name%></a>
+            </div>
+        </div>
+    </header>
+    <section class="product" id="product">
+        <div class="box-container">
+            <%product.forEach((item)=>{%>
+                <div class="box">
+                    <span class="discount"><%=item.discount%></span>
+                    <div class="icons">
+                        <a href="#" class="fas fa-heart"></a>
+                        <a href="#" class="fas fa-share"></a>
+                        <a href="#" class="fas fa-eye"></a>
+                    </div>
+                    <img src="<%=item.image%>" alt="">
+                    <h3><%=item.name%></h3>
+                    <div class="starts">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star-half-alt"></i>
+                    </div>
+                    <div class="price"><span><%=item.price%></span> $10.10</div>
+                    <div class="quantity">
+                        <span>quantity:</span>
+                        <input type="number" min="1" max="1000" value="1" />
+                        <span>/ kg</span>
+                    </div>
+                    <a href="/buy" class="btn">buy now</a>
+                </div>
+                <%})%>
+
+        </div>
+    </section>
+</body>
+
+</html>

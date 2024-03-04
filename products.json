@@ -1,0 +1,38 @@
+[
+    {
+        "name":"Organic Banana",
+        "price":"100",
+        "image":"https://media.istockphoto.com/id/162487071/photo/banana-bunch.jpg?s=2048x2048&w=is&k=20&c=8XvMyoA-RGTTiyQwWI21wIkMqGt8_gMHO2Du82OsKZQ=",
+        "discount":"30%"
+    },
+    {
+        "name":"Organic Tomato",
+        "price":"100",
+        "image":"https://t4.ftcdn.net/jpg/03/27/96/23/240_F_327962332_6mb5jQLnTOjhYeXML7v45Hc5eED2GYOD.jpg",
+        "discount":"30%"
+    },
+    {
+        "name":"Organic Banana",
+        "price":"100",
+        "image":"https://media.istockphoto.com/id/162487071/photo/banana-bunch.jpg?s=2048x2048&w=is&k=20&c=8XvMyoA-RGTTiyQwWI21wIkMqGt8_gMHO2Du82OsKZQ=",
+        "discount":"30%"
+    },
+    {
+        "name":"Organic Tomato",
+        "price":"100",
+        "image":"https://t4.ftcdn.net/jpg/03/27/96/23/240_F_327962332_6mb5jQLnTOjhYeXML7v45Hc5eED2GYOD.jpg",
+        "discount":"30%"
+    },
+    {
+        "name":"Organic Banana",
+        "price":"100",
+        "image":"https://media.istockphoto.com/id/162487071/photo/banana-bunch.jpg?s=2048x2048&w=is&k=20&c=8XvMyoA-RGTTiyQwWI21wIkMqGt8_gMHO2Du82OsKZQ=",
+        "discount":"30%"
+    },
+    {
+        "name":"Organic Tomato",
+        "price":"100",
+        "image":"https://t4.ftcdn.net/jpg/03/27/96/23/240_F_327962332_6mb5jQLnTOjhYeXML7v45Hc5eED2GYOD.jpg",
+        "discount":"30%"
+    }
+]
