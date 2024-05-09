@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        form {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th,
+        td {
+            padding: 8px;
+            border-bottom: 1px solid #ddd;
+            text-align: center;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        tr:hover {
+            background-color: #f2f2f2;
+        }
+
+        .action-buttons {
+            display: flex;
+            justify-content: space-around;
+        }
+
+        .edit,
+        .delete {
+            padding: 4px 8px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Admin Page</h1>
+    <button><a href="/logout">Logout</a></button>
+    <div id="errorMessage" style="color: red; text-align: center; margin-bottom: 10px;"></div>
+
+    <form id="productForm">
+        Product id: <input type="text" id="pid" name="pid"><br><br>
+        Product Name: <input type="text" id="name" name="name"><br><br>
+        Price: <input type="number" id="price" name="price"><br><br>
+        Quantity: <input type="number" id="Quantity" name="Quantity"><br><br>
+        Image: <input type="file" id="image" name="image"><br><br>
+        <input type="submit" id="btn" value="Add">
+    </form>
+    <table id="productTable" border="1">
+        <!-- Your existing table structure -->
+    </table>
+    <script>
+        var btn = document.getElementById("btn");
+        var name1 = document.getElementById("name");
+        var price = document.getElementById("price");
+        var Quantity = document.getElementById("Quantity");
+        var pid = document.getElementById("pid");
+        var table = document.getElementById("productTable");
+        var lgout = document.getElementById("logout");
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Fetch all products from the database
+            const response = await fetch('/admin/allproducts');
+            if (response.ok) {
+                const products = await response.json();
+                products.forEach(product => {
+                    renderTable(product);
+                });
+            } else {
+                console.error('Error fetching products:', response.statusText);
+            }
+        });
+
+
+        btn.addEventListener('click', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(productForm);
+            const response = await fetch('/admin/addproduct', {
+                method: 'POST',
+                'Content-Type': 'application/json',
+                body: formData,
+            });
+
+
+            if (response.ok) {
+                const data = await response.json();
+                console.log('Product added successfully:', data);
+                renderTable(data);
+            } else {
+                const responseData = await response.json();
+                console.error('Error adding product:', responseData.message);
+                errorMessage.innerText = responseData.message;
+            }
+        });
+
+       
+
+        function renderTable(obj) {
+            if (!table.querySelector("thead")) {
+                var thead = document.createElement('thead');
+                var tr = document.createElement('tr');
+                var th2 = document.createElement('th');
+                th2.innerText = 'Image';
+                var th1 = document.createElement('th');
+                th1.innerText = 'Product ID';
+                var th3 = document.createElement('th');
+                th3.innerText = 'Name';
+                var th4 = document.createElement('th');
+                th4.innerText = 'Price';
+                var th5 = document.createElement('th');
+                th5.innerText = 'Quantity';
+                var th6 = document.createElement('th');
+                th6.innerText = 'Actions';
+                tr.append(th1, th2, th3, th4, th5, th6);
+                thead.append(tr);
+                table.append(thead);
+            }
+
+            var tbody = table.querySelector('tbody');
+            if (!tbody) {
+                tbody = document.createElement('tbody');
+                table.append(tbody);
+            }
+            var tr = document.createElement('tr');
+            var td1 = document.createElement('td');
+            td1.innerText = obj.pid;
+            var td2 = document.createElement('td');
+            var img = document.createElement('img');
+            img.src = obj.image;
+            img.alt = "Product Image";
+            img.style.maxWidth = "100px";
+            td2.appendChild(img);
+
+            var td3 = document.createElement('td');
+            td3.innerText = `${obj.name}`;
+
+            var td4 = document.createElement('td');
+            td4.innerText = `${obj.price}`;
+
+            var td5 = document.createElement('td');
+            td5.innerText = `${obj.Quantity}`;
+
+            var td6 = document.createElement('td');
+            var edit = document.createElement("button");
+            var del = document.createElement("button");
+            edit.innerText = "Edit";
+            del.innerText = "Delete";
+            edit.setAttribute("onClick", "handleedit(this)")
+            del.setAttribute("onClick", "handledelete(this)")
+            td6.append(edit);
+            td6.append(del);
+
+            tr.append(td1, td2, td3, td4, td5, td6);
+            tbody.append(tr);
+        }
+
+        function handledelete(button) {
+            if (confirm("Are you sure you want to delete this product?")) {
+                var row = button.parentNode.parentNode;
+                var pid = row.cells[0].innerText;
+
+                fetch(`/admin/deleteproduct/${pid}`, {
+                    method: 'DELETE'
+                }).then(response => {
+                    if (response.ok) {
+                        row.remove();
+                        alert("Product deleted successfully!");
+                    } else {
+                        alert("Failed to delete product.");
+                    }
+                }).catch(error => {
+                    console.error('Error deleting product:', error);
+                    alert("Failed to delete product.");
+                });
+            }
+        }
+
+        var editMode = false;
+        var editRow = null;
+
+        async function handleedit(ob) {
+            if (!editMode) {
+                editRow = ob.parentNode.parentNode;
+                editRow.cells[2].contentEditable = true;
+                editRow.cells[3].contentEditable = true;
+                editRow.cells[4].contentEditable = true;
+                editRow.cells[2].style.border = "3px black solid";
+                editRow.cells[3].style.border = "3px black solid";
+                editRow.cells[4].style.border = "3px black solid";
+                ob.innerText = "Save";
+                editMode = true;
+            } else {
+                editRow.cells[2].contentEditable = false;
+                editRow.cells[3].contentEditable = false;
+                editRow.cells[4].contentEditable = false;
+                editRow.cells[2].style.border = "1px black solid";
+                editRow.cells[3].style.border = "1px black solid";
+                editRow.cells[4].style.border = "1px black solid";
+                ob.innerText = "Edit";
+                editMode = false;
+
+                // Get the updated values
+                const pid = editRow.cells[0].innerText;
+                const name = editRow.cells[2].innerText;
+                const price = editRow.cells[3].innerText;
+                const Quantity = editRow.cells[4].innerText;
+                console.log(pid);
+                const obj = {
+                    pid, name, price, Quantity
+                }
+                console.log(obj);
+                // Send the updated values to the server to update the database
+                const response = await fetch('/admin/updateproduct', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(obj)
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('Product updated successfully:', data);
+                } else {
+                    const responseData = await response.json();
+                    console.error('Error updating product:', responseData.message);
+                    //errorMessage.innerText = responseData.message;
+                }
+
+            }
+        }
+
+    </script>
+
+</body>
+
+</html>

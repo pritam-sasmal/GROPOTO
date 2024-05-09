@@ -1,0 +1,82 @@
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+
+        form {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        input,
+        select {
+            width: 100%;
+            margin-bottom: 10px;
+            padding: 8px;
+            border-radius: 3px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+        }
+
+        input[type="submit"] {
+            background-color: #28a745;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #28a745;
+        }
+
+        a {
+            color: #28a745;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .error-message {
+            color: red;
+            display: block;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <form action="/signup" method="post" id="myform">
+        <% if (message) { %>
+            <div class="error-message">
+                <%= message %>
+            </div>
+            <% } %>
+                Name: <input type="text" id="name" name="name" required><br>
+                Email: <input type="email" id="email" name="email" required><br>
+                Password: <input type="password" id="password" name="password" required><br>
+                Address:<br>
+                <textarea name="address" id="" cols="30" rows="5" placeholder="enter address here..."></textarea><br>
+                Role: <select name="role" id="role">
+                    <option value="user">user</option>
+                    <option value="admin">admin</option>
+                </select><br>
+                <input type="submit" id="signup" value="Sign Up"><br>
+                If you have an account, please <a href="/login">login</a>.
+    </form>
+</body>
+
+</html>

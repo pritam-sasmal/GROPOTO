@@ -1,5 +1,7 @@
 const express = require("express");
 const router = express.Router();
+const path=require("path");
+const fs=require("fs");
 const users = require("../models/userModel");
 const multer = require("multer");
 
@@ -10,7 +12,18 @@ const multer = require("multer");
 router.get("/", async (req, res) => {
     try {
         const responseData = await users.findOne({ email: req.session.email });
-        res.render("user/profile", { data: responseData });
+        fs.readFile(path.join(__dirname, "../user/profile.html"), "utf8", (err, data) => {
+            if (err) {
+                res.status(500).send("Error reading file");
+                return;
+            }
+            let modifiedHtml = data.replace("username[0].name", responseData.name);
+            modifiedHtml = modifiedHtml.replace("username[0].email", responseData.email);
+            modifiedHtml = modifiedHtml.replace("username[0].address", responseData.address);
+
+            // Send the modified HTML as response
+            res.send(modifiedHtml);
+        });
     } catch (err) {
         console.error(err);
         res.status(500).send("Internal Server Error");

@@ -118,6 +118,7 @@ section{
     border-radius:.5rem;
     color:var(--black);
 }
+
 .header-2 .navbar a:hover{
     background: var(--green);
     color:#fff;
@@ -130,67 +131,55 @@ section{
 .header-2 .icons a:hover{
     color:var(--green);
 }
-#menu-bar{
-    font-size:3rem;
-    border-radius:.5rem;
-    border:.1rem solid var(--black);
-    padding:.8rem 1.5rem;
-    color:var(--black);
-    cursor:pointer;
-    display:none;
-}
-.home{
-    display:flex;
-    align-items: center;
-    justify-content: center;
-    flex-wrap:wrap;
-}
-.home .image{
-    flex:1 1 40rem;
-    padding-top:5rem;
-}
-.home .image img{
-    width:55%;
-    height:55%;
-}
-.home .content{
-    flex:1 1 40rem;
-}
-.home .content span{
-    font-size:3rem;
-    color:#666;
-}
-.home .content h3{
-    font-size:5rem;
-    color:var(--black);
-}
-#productContainer {
+#container {
     display: flex;
     flex-wrap: wrap;
-    justify-content: space-around;
-    margin-top: 20px;
+    justify-content: center;
+    margin-top:20px;
 }
-
-.product-item {
-    width: 300px;
-    margin-bottom: 20px;
+.product {
+    /* border: 1px solid #ccc;
+    border-radius: 5px;
+    margin: 10px;
     padding: 10px;
-    border: 1px solid #ddd;
+    width: 300px;
+    box-sizing: border-box; */
+    width: 300px;
+    font-size:15px;
+    margin-bottom: 20px;
+    margin-left:20px;
+    padding: 10px;
+    border: 1px solid white;
     border-radius: 5px;
     text-align: center;
     background-color: #fff;
     box-shadow: 2px 2px 5px #ccc;
 }
-
-.product-item button {
+.header-2.active img {
+    width: 100%;
+    height: auto;
+    border-radius: 5px;
+}
+.product button {
+    /* display: block;
+    width: 100%;
+    padding: 5px;
+    margin-top: 10px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer; */
     margin-top: 10px;
     padding: 5px 10px;
     cursor: pointer;
-    background-color: #007bff;
+    background-color: var(--green);
     color: #fff;
     border: none;
     border-radius: 3px;
     box-shadow: 1px 1px 3px #666;
 }
-
-
+.product button:hover {
+    background-color: rgb(247, 252, 247);
+    color:var(--green);
+}

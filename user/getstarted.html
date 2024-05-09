@@ -1,0 +1,157 @@
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+    <link rel="stylesheet" href="getstarted.css">
+</head>
+
+<body>
+    <header>
+        <div class="header-1">
+            <a href="#" class="logo"><i class="fas fs-shopping-basket">gropoto</i></a>
+            <form action="" class="search-box-container">
+                <input type="search" id="search-box" placeholder="search here...">
+                <label for="search-box" class="fas fa-search"></label>
+            </form>
+        </div>
+        <div class="header-2">
+            <!-- <div id="menu-bar" class="fas fa-bars"></div> -->
+            <nav class="navbar">
+                <a href="#home">home</a>
+                <a href="#deal">order</a>
+                <a href="#contact">contact</a>
+                <a id="loginButton" href="/login" class="login-button">Login</a>
+            </nav>
+            <div class="icons">
+                <a id="cart-product" class="fas fa-shopping-cart"></a>
+                <a href="#" class="fas fa-heart"></a>
+                <a href="/login" class="fas fa-user-circle"></a>
+            </div>
+        </div>
+    </header>
+    <div id="container">
+
+    </div>
+
+    <script>
+        let productcontainer = document.getElementById("container");
+        fetch('/allproducts')
+            .then(response => response.json())
+            .then(data => {
+                //console.log(data);
+                //const dataContainer = document.getElementById('dataContainer');
+                data.forEach(item => {
+                    appendProduct(item);
+                });
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        function appendProduct(item) {
+            var div = document.createElement('div');
+            div.classList.add('product');
+            if (item.image) {
+                var img = document.createElement('img');
+                img.src = item.image;
+                img.alt = "Product Image";
+                img.style.maxWidth = "100px";
+                div.append(img);
+            }
+            var br = document.createElement("br");
+            div.append(br);
+            var name = document.createElement('p');
+            name.innerText = `Name: ${item.name}`;
+            div.append(name);
+
+            var price = document.createElement('p');
+            price.innerText = `Price: ${item.price}`;
+            div.append(price);
+
+            var quantity = document.createElement('p');
+            quantity.innerText = `Quantity: ${item.Quantity}`;
+            div.append(quantity);
+
+            // Add error message div
+            var errorMessage = document.createElement('div');
+            errorMessage.id = 'errorMessage';
+            errorMessage.style.color = 'red';
+            errorMessage.style.textAlign = 'center';
+            errorMessage.style.marginBottom = '10px';
+            div.append(errorMessage);
+
+            //add successful div
+            var successMessage = document.createElement('div');
+            successMessage.id = 'successMessage';
+            successMessage.style.color = 'green';
+            successMessage.style.textAlign = 'center';
+            successMessage.style.marginBottom = '10px';
+            div.append(successMessage);
+
+            var addtocart = document.createElement("button");
+            addtocart.innerText = "Add to cart";
+            addtocart.dataset.item = JSON.stringify(item);
+            addtocart.addEventListener("click", handleaddtocart);
+            div.append(addtocart);
+
+            productcontainer.append(div);
+        }
+
+        async function handleaddtocart(event) {
+            var button = event.target;
+
+
+            var item = JSON.parse(button.dataset.item);
+            //var item = button.dataset.item;
+            //console.log(button.dataset.item)
+            console.log(item);
+            const response = await fetch('/addtocart', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(item)
+            });
+            console.log(response.status)
+            if (response.status == 201)
+                window.location.href = "/login";
+            else {
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('Product added successfully:', data.message);
+                    // renderTable(data);
+                    var successMessage = button.parentElement.querySelector('#successMessage');
+                    successMessage.innerText = data.message;
+                    setTimeout(() => {
+                        successMessage.innerText = '';
+                    }, 3000);
+                } else {
+                    const data = await response.json();
+                    console.error('Error adding product:', data.message);
+                    // Show error message in the product div
+                    var errorMessage = button.parentElement.querySelector('#errorMessage');
+                    errorMessage.innerText = data.message;
+                    setTimeout(() => {
+                        errorMessage.innerText = '';
+                    }, 3000);
+                }
+            }
+        };
+
+        document.getElementById("cart-product").addEventListener('click',async (e)=>{
+            const response=await fetch('/cartproduct');
+            console.log(response.status);
+            if(response.status==201){
+                window.location.href="/login";
+            }
+            if(response.ok){
+                console.log(response.json());
+            }
+        })
+       
+    </script>
+</body>
+
+</html>
