@@ -5,10 +5,12 @@ const bcrypt = require('bcrypt');
 const bodyParser = require('body-parser');
 const app = express();
 const path = require("path");
+const multer = require("multer");
 app.use(express.static("css"))
 app.use(express.static("js"))
 app.use(express.static("images"))
 app.use(express.static("public/files"))
+app.use(express.static("public/images"))
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 app.use(express.urlencoded());
@@ -40,14 +42,6 @@ app.get("/logout", (req, res) => {
 })
 const getstarted = require("./routing/getstarted");
 app.use("/allproducts", getstarted);
-// function allproductsauth(){
-//     if(req.session.email){
-//         next();
-//     }
-//     else{
-//         res.sendFile(path.join(__dirname,"./user/getstarted.html"));
-//     }
-// }
 
 const admin = require("./routing/admin");
 app.use("/admin", adminauth, admin);
@@ -60,26 +54,22 @@ function adminauth(req, res, next) {
     }
 }
 function auth(req, res, next) {
-    //console.log(req.session.email);
     if (req.session.email) {
         next();
     }
     else {
         res.status(201).send("Failure");
-        //console.log("hi");
-        // res.redirect("/login");
     }
 }
 const addtocart = require("./routing/addtocart");
 app.use("/addtocart", auth, addtocart);
 app.get("/", async (req, res) => {
     if (req.session.email && req.session.password) {
-        if (req.session.email === "admin@gmail.com" && req.session.password === "1234") {
+        if (req.session.email === "admin@gmail.com") {
             res.sendFile(path.join(__dirname, "./admin/product.html"));
         }
         else {
             let user = await Users.find({ email: req.session.email });
-            //console.log(user[0].name);
             fs.readFile(path.join(__dirname, "./user/user.html"), "utf8", (err, data) => {
                 if (err) {
                     res.status(500).send("Error reading file");
@@ -94,15 +84,13 @@ app.get("/", async (req, res) => {
         res.sendFile(path.join(__dirname, "./user/index.html"));
     }
 })
-const cartproduct=require("./routing/cartproduct");
-app.use("/cartproduct",cartproductauth,cartproduct);
-function cartproductauth(req,res,next){
+const cartproduct = require("./routing/cartproduct");
+app.use("/cartproduct", cartproductauth, cartproduct);
+function cartproductauth(req, res, next) {
     if (req.session.email) {
-        console.log("hello");
         next();
     }
     else {
-        console.log("hi");
         res.status(201).send("Failure");
     }
 }
@@ -120,95 +108,71 @@ function profileauth(req, res, next) {
 app.get("/signup", (req, res) => {
     res.render("signup", { message: "" });
 })
-app.post("/signup", async (req, res) => {
-    const { name, email, password, address, role } = req.body;
-    const obj = {
-        name, email, password, address, role
+
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, 'public/images');
+    },
+    filename: function (req, file, cb) {
+        const userEmail = req.body.email;
+        cb(null, `${userEmail}.jpg`);
     }
-    //console.log(obj);
-    const existuser = await Users.findOne({ email: email });
-    const userobj = new Users(obj);
-    if (existuser) {
-        res.render("signup", { message: "This email already used" });
-    }
-    else {
-        if (obj.role === "admin") {
-            if (obj.email === "admin@gmail.com" && obj.password === "1234") {
-                userobj.save(obj).then(response => {
-                    req.session.name = req.body.name;
-                    req.session.email = req.body.email;
-                    req.session.password = req.body.password;
-                    req.session.address = req.body.address;
-                    req.session.role = req.body.role;
-                    res.redirect("/admin");
-                })
-            }
-            else {
-                res.render("signup", { message: "I think you are not admin😂" });
-            }
-        }
-        else {
-            userobj.save(obj).then(response => {
-                req.session.name = req.body.name;
-                req.session.email = req.body.email;
-                req.session.password = req.body.password;
-                req.session.role = req.body.role;
-                res.redirect("/",);
-            })
-        }
-    }
-    // let { name, email, password, address, role } = req.body;
-    // const hashedPassword = await bcrypt.hash(password, 10);
-    // password = hashedPassword;
-    // // Create a new user
-    // const existuser = await Users.findOne({ email: email });
-    // const obj = {
-    //     name, email, password, address, role
-    // }
-    // const userobj = new Users(obj);
-    // if (existuser) {
-    //     res.render("signup", { message: "This email already used" });
-    // }
-    // else {
-    //     if (obj.email === "admin@gmail.com") {
-    //         res.render("signup", { message: "This email already used" });
-    //     }
-    //     else {
-    //         userobj.save(obj).then(response => {
-    //             req.session.name = req.body.name;
-    //             req.session.email = req.body.email;
-    //             req.session.password = password;
-    //             req.session.role = req.body.role;
-    //             res.redirect("/",);
-    //         })
-    //     }
-    // }
+});
+const upload = multer({ storage: storage });
 
 
-})
-
+app.post("/signup", upload.single('image'), async (req, res) => {
+    const { name, email, password, address, role} = req.body;
+    const imagePath = req.file ? req.file.path : null; 
+    //console.log(req.body.image);
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const existUser = await Users.findOne({ email: email });
+    if (existUser) {
+        return res.render("signup", { message: "This email is already in use" });
+    }
+    if(role==="admin"){
+        return res.render("signup", { message: "you are not admin" });
+    }
+    const userObj = new Users({ name, email, password: hashedPassword, address, role, image:`${email}.jpg` });
+    userObj.save().then(response => {
+        req.session.name = req.body.name;
+        req.session.email = req.body.email;
+        req.session.password = hashedPassword;
+        req.session.address = req.body.address;
+        req.session.role = req.body.role;
+        res.redirect(userObj.role === "admin" ? "/admin" : "/");
+    }).catch(err => {
+        console.error(err);
+        res.status(500).send("Error saving user");
+    });
+});
 app.get("/login", (req, res) => {
     res.render("login", { message: "" });
 })
 app.post("/login", async (req, res) => {
-    //console.log("hi");
-    Users.find({ $and: [{ email: req.body.email }, { password: req.body.password }] }).then((response) => {
-        if (response.length == 0) {
-            res.render("login", { message: "invalid email or password" });
+    Users.findOne({ email: req.body.email }).then((response) => {
+        if (!response) {
+            return res.render("login", { message: "Invalid email or password" });
         }
-        else if (response[0].role === "admin") {
-            req.session.email = response[0].email;
-            req.session.password = response[0].password;
-            req.session.role = response[0].role;
-            res.redirect("/admin");
-        }
-        else {
-            req.session.email = response[0].email;
-            req.session.password = response[0].password;
-            req.session.role = response[0].role;
-            res.redirect("/");
-        }
-    })
+
+        
+        bcrypt.compare(req.body.password, response.password, (err, result) => {
+            if (err || !result) {
+                return res.render("login", { message: "Invalid email or password" });
+            }
+
+            req.session.email = response.email;
+            req.session.password = response.password;
+            req.session.role = response.role;
+
+            if (response.role === "admin") {
+                res.redirect("/admin");
+            } else {
+                res.redirect("/");
+            }
+        });
+    });
+
 })
 app.listen(3000, (err) => {
     if (err) {

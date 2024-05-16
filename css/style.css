@@ -8,6 +8,7 @@
     font-family: 'Nunito', sans-serif;
     margin:0;
     padding:0;
+    color:white;
     box-sizing: border-box;
     outline: none;
     border:none;
@@ -192,5 +193,8 @@ section{
     border-radius: 3px;
     box-shadow: 1px 1px 3px #666;
 }
-
+.home .image img{
+    width: 600px;
+    height:400px;
+}
 

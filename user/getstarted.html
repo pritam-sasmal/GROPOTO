@@ -14,20 +14,20 @@
             <a href="#" class="logo"><i class="fas fs-shopping-basket">gropoto</i></a>
             <form action="" class="search-box-container">
                 <input type="search" id="search-box" placeholder="search here...">
-                <label for="search-box" class="fas fa-search"></label>
+                <label for="search-box" class="fas fa-search" id="search-for"></label>
             </form>
         </div>
         <div class="header-2">
             <!-- <div id="menu-bar" class="fas fa-bars"></div> -->
             <nav class="navbar">
-                <a href="#home">home</a>
+                <a href="/">home</a>
                 <a href="#deal">order</a>
                 <a href="#contact">contact</a>
                 <a id="loginButton" href="/login" class="login-button">Login</a>
             </nav>
             <div class="icons">
                 <a id="cart-product" class="fas fa-shopping-cart"></a>
-                <a href="#" class="fas fa-heart"></a>
+                <!-- <a href="#" class="fas fa-heart"></a> -->
                 <a href="/login" class="fas fa-user-circle"></a>
             </div>
         </div>
@@ -38,65 +38,73 @@
 
     <script>
         let productcontainer = document.getElementById("container");
-        fetch('/allproducts')
-            .then(response => response.json())
-            .then(data => {
-                //console.log(data);
-                //const dataContainer = document.getElementById('dataContainer');
-                data.forEach(item => {
-                    appendProduct(item);
+        let searchField = document.querySelector("#search-box");
+        let btn = document.querySelector("#search-for");
+
+        const alldata = async () => {
+            console.log(searchField.value);
+            await fetch('/allproducts', { method: "POST", headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ searchItem: searchField.value }) })
+                .then(response => response.json())
+                .then(data => {
+                    appendProduct(data);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
                 });
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
+        }
+
+        btn.addEventListener('click', alldata);
+        alldata();
         function appendProduct(item) {
-            var div = document.createElement('div');
-            div.classList.add('product');
-            if (item.image) {
-                var img = document.createElement('img');
-                img.src = item.image;
-                img.alt = "Product Image";
-                img.style.maxWidth = "100px";
-                div.append(img);
-            }
-            var br = document.createElement("br");
-            div.append(br);
-            var name = document.createElement('p');
-            name.innerText = `Name: ${item.name}`;
-            div.append(name);
+            productcontainer.innerHTML="";
+            item.forEach((item) => {
+                var div = document.createElement('div');
+                div.classList.add('product');
+                if (item.image) {
+                    var img = document.createElement('img');
+                    img.src = item.image;
+                    img.alt = "Product Image";
+                    img.style.maxWidth = "100px";
+                    div.append(img);
+                }
+                var br = document.createElement("br");
+                div.append(br);
+                var name = document.createElement('p');
+                name.innerText = `Name: ${item.name}`;
+                div.append(name);
 
-            var price = document.createElement('p');
-            price.innerText = `Price: ${item.price}`;
-            div.append(price);
+                var price = document.createElement('p');
+                price.innerText = `Price: ${item.price}`;
+                div.append(price);
 
-            var quantity = document.createElement('p');
-            quantity.innerText = `Quantity: ${item.Quantity}`;
-            div.append(quantity);
+                var quantity = document.createElement('p');
+                quantity.innerText = `Quantity: ${item.Quantity}`;
+                div.append(quantity);
 
-            // Add error message div
-            var errorMessage = document.createElement('div');
-            errorMessage.id = 'errorMessage';
-            errorMessage.style.color = 'red';
-            errorMessage.style.textAlign = 'center';
-            errorMessage.style.marginBottom = '10px';
-            div.append(errorMessage);
+                // Add error message div
+                var errorMessage = document.createElement('div');
+                errorMessage.id = 'errorMessage';
+                errorMessage.style.color = 'red';
+                errorMessage.style.textAlign = 'center';
+                errorMessage.style.marginBottom = '10px';
+                div.append(errorMessage);
 
-            //add successful div
-            var successMessage = document.createElement('div');
-            successMessage.id = 'successMessage';
-            successMessage.style.color = 'green';
-            successMessage.style.textAlign = 'center';
-            successMessage.style.marginBottom = '10px';
-            div.append(successMessage);
+                //add successful div
+                var successMessage = document.createElement('div');
+                successMessage.id = 'successMessage';
+                successMessage.style.color = 'green';
+                successMessage.style.textAlign = 'center';
+                successMessage.style.marginBottom = '10px';
+                div.append(successMessage);
 
-            var addtocart = document.createElement("button");
-            addtocart.innerText = "Add to cart";
-            addtocart.dataset.item = JSON.stringify(item);
-            addtocart.addEventListener("click", handleaddtocart);
-            div.append(addtocart);
+                var addtocart = document.createElement("button");
+                addtocart.innerText = "Add to cart";
+                addtocart.dataset.item = JSON.stringify(item);
+                addtocart.addEventListener("click", handleaddtocart);
+                div.append(addtocart);
 
-            productcontainer.append(div);
+                productcontainer.append(div);
+            })
         }
 
         async function handleaddtocart(event) {

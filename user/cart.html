@@ -50,6 +50,13 @@
 
         button {
             margin-right: 10px;
+            padding: 5px 10px;
+            cursor: pointer;
+            background-color: #27ae60;
+            color: #fff;
+            border: none;
+            border-radius: 3px;
+            box-shadow: 1px 1px 3px #666;
         }
 
         img {
@@ -76,17 +83,15 @@
     <div id="cartContainer"></div>
 
     <script>
-        //console.log('done loading')
         const cartContainer = document.getElementById('cartContainer');
 
         fetch('/cartproduct')
             .then(response => response.json())
             .then(data => {
-                if (data.length === 0) {
+                if (data.length == 0) {
                     cartContainer.innerHTML = '<p>Your cart is empty</p>';
                 } else {
                     data.forEach(item => {
-                        console.log(item);
                         appendProduct(item);
                     });
                 }
@@ -96,38 +101,107 @@
                 cartContainer.innerHTML = '<p>Error fetching cart data</p>';
             });
 
-            function appendProduct(item) {
-    var div = document.createElement('div');
-    div.classList.add('product');
-    if (item.image) {
-        var img = document.createElement('img');
-        img.src = `${item.image}`; // Corrected interpolation syntax
-        img.alt = "Product Image";
-        img.style.maxWidth = "100px";
-        div.append(img);
-    }
-    var br = document.createElement("br");
-    div.append(br);
-    var name = document.createElement('p');
-    name.innerText = `Name: ${item.name}`;
-    div.append(name);
+        function appendProduct(item) {
+            var div = document.createElement('div');
+            div.classList.add('product');
+            if (item.image) {
+                var img = document.createElement('img');
+                img.src = `${item.image}`;
+                img.alt = "Product Image";
+                img.style.maxWidth = "100px";
+                div.append(img);
+            }
+            var br = document.createElement("br");
+            div.append(br);
+            var name = document.createElement('p');
+            name.innerText = `Name: ${item.name}`;
+            div.append(name);
 
-    var price = document.createElement('p');
-    price.innerText = `Price: ${item.price}`;
-    div.append(price);
+            var price = document.createElement('p');
+            price.innerText = `Price: ${item.price}`;
+            div.append(price);
 
-    var quantity = document.createElement('p');
-    quantity.innerText = `Quantity: ${item.Quantity}`;
-    div.append(quantity);
+            var quantity = document.createElement('p');
+            quantity.innerText = `Quantity: ${item.Quantity}`;
+            div.append(quantity);
 
-    var addtocart = document.createElement("button");
-    addtocart.innerText = "Add to cart";
-    addtocart.dataset.item = JSON.stringify(item);
-   // addtocart.addEventListener("click", handleaddtocart);
-    div.append(addtocart);
+            var increaseBtn = document.createElement("button");
+            increaseBtn.innerText = "+";
+            increaseBtn.onclick = function () {
+                item.Quantity++;
+                item.price = parseInt(item.price) + (parseInt(item.price) / (item.Quantity - 1)); // Update the price based on your logic here
+                updateCartItem(item, quantity, price);
+            };
+            div.append(increaseBtn);
 
-    cartContainer.append(div);
-}
+            var decreaseBtn = document.createElement("button");
+            decreaseBtn.innerText = "-";
+            decreaseBtn.onclick = function () {
+                if (item.Quantity > 1) {
+                    item.Quantity--;
+                    item.price = parseInt(item.price) - (parseInt(item.price) / (item.Quantity + 1)); // Update the price based on your logic here
+                    updateCartItem(item, quantity, price);
+                }
+            };
+            div.append(decreaseBtn);
+
+
+
+            var buynow = document.createElement("button");
+            buynow.innerText = "Buy now";
+            buynow.dataset.item = JSON.stringify(item);
+            div.append(buynow);
+
+            var remove = document.createElement("button");
+            remove.innerText = "remove";
+            remove.dataset.item = JSON.stringify(item);
+            remove.addEventListener("click", handleremove);
+            div.append(remove);
+
+            cartContainer.append(div);
+        }
+        function handleremove(event) {
+            var button = event.target;
+            var item = JSON.parse(button.dataset.item);
+            fetch('/cartproduct/remove', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ pid: item.pid })
+            })
+                .then(response => {
+                    if (response.ok) {
+                        button.closest('.product').remove(); // Remove the product from the UI
+                    }
+                    else {
+                        console.error('Error removing item:', response.statusText);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error removing item:', error);
+                });
+        }
+        function updateCartItem(item, quantityElem, priceElem) {
+            console.log(item.price);
+            fetch('/cartproduct/updateCartItem', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ pid: item.pid, Quantity: item.Quantity, price: item.price })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data.message);
+                    quantityElem.innerText = `Quantity: ${item.Quantity}`;
+                    priceElem.innerText = `Price: ${item.price}`;
+                })
+                .catch(error => {
+                    console.error('Error updating cart item:', error);
+                    // Handle the error if necessary
+                });
+        }
 
     </script>
 </body>

@@ -7,10 +7,25 @@ router.use(express.json());
 const fs=require("fs");
 const users = require("../models/userModel");
 const Allproducts=require("../models/allProduct");
-router.get("/",(req,res)=>{
-    Allproducts.find({}).then(response=>{
-        res.json(response);
-    })
+// router.get("/",(req,res)=>{
+//     Allproducts.find({}).then(response=>{
+//         res.json(response);
+//     })
+// })
+router.post("/", (req, res) => {
+    console.log(!req.body.searchItem);
+    if (!req.body.searchItem) {
+        Allproducts.find({}).then(response => {
+            res.json(response);
+        })
+    }else{
+        console.log(req.body.searchItem);
+        Allproducts.find({"name":req.body.searchItem}).then((respo)=>{
+            console.log(respo);
+            res.json(respo);
+        })
+    }
+
 })
 router.get("/getstarted",async(req,res)=>{
     let isLoggedIn = false;

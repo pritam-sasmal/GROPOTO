@@ -45,6 +45,7 @@ router.post("/", async (req, res) => {
 
         }
         else {
+            //console.log("hello");
 
             const newCart = new Cartproduct({
                 email: req.session.email,
@@ -57,7 +58,7 @@ router.post("/", async (req, res) => {
                 }]
             });
             await newCart.save();
-            return res.status(400).json({message: "Product added to cart"});
+            return res.send({message: "Product added to cart"});
         }
     } catch (err) {
         console.error("Error occurred:", err);

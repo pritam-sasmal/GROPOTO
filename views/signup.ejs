@@ -59,7 +59,7 @@
 </head>
 
 <body>
-    <form action="/signup" method="post" id="myform">
+    <form action="/signup" method="post" id="myform" enctype="multipart/form-data">
         <% if (message) { %>
             <div class="error-message">
                 <%= message %>
@@ -74,6 +74,7 @@
                     <option value="user">user</option>
                     <option value="admin">admin</option>
                 </select><br>
+                Profile Image: <input type="file" id="image" name="image"><br>
                 <input type="submit" id="signup" value="Sign Up"><br>
                 If you have an account, please <a href="/login">login</a>.
     </form>
