@@ -42,10 +42,12 @@
         let btn = document.querySelector("#search-for");
 
         const alldata = async () => {
+            await console.log("hi");
             console.log(searchField.value);
             await fetch('/allproducts', { method: "POST", headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ searchItem: searchField.value }) })
                 .then(response => response.json())
                 .then(data => {
+                    console.log(data);
                     appendProduct(data);
                 })
                 .catch(error => {
